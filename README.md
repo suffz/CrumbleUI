@@ -2,8 +2,6 @@
 ## INFO
 This release is unstable and only functions good enough to run the snipe command, the backend is there for functionality improvements i am getting there.
 
-(editing config values is currently impossible, next update will have a working Settings modal pop-up)
-
 This requires GCC (C Compiler)
 
 Tutorial: 
