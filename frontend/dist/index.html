@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.22/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <link href="//cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@4/dark.css" rel="stylesheet">
+    <script src="./src/user.js"></script>
+    <script src="./src/vanilla.js"></script>
+    <title>#Profile</title>
+</head>
+
+<script>
+    window.onload = function () {
+
+        window.go.main.App.ReturnAccounts().then(resp => {
+            for (let i = 0; i < resp.length; i++) {
+                add_account_html(resp[i]);
+            }
+        })
+
+        window.go.main.App.GetAllTasks().then(resp => {
+            for (let i = 0; i < resp.length; i++) {
+                add_task_html(resp[i]);
+            }
+        })
+
+        window.go.main.App.GetThreeChar().then(resp => {
+            let data = JSON.parse(resp);
+            data.data.forEach((acc) => {
+                console.log(acc)
+                add_task_html_3c(acc);
+            })
+        })
+
+        window.go.main.App.GetProxys().then(resp => {
+            console.log(resp)
+            let data = ""
+            resp.forEach((acc) => {
+                if (acc !== "") {
+                    let dataa
+                    let d = acc.split(":");
+                    if (d.length > 2) {
+                        dataa = {IP:d[0],Port:d[1],User:d[2],Password:d[3]}
+                    } else {
+                        dataa = {IP:d[0],Port:d[1]}
+                    }
+
+                    acc = dataa
+                    console.log(acc)
+
+                    if (acc.Password) {
+                        hash = ""
+                        for (let i = 0; i < acc.Password.length; i++) {
+                            hash += "."
+                        }
+                        acc.Password = hash
+                    }
+
+                    data += (`<tr>
+            <td>
+                <span class="font-mono">
+                    ${acc.IP}
+                </span>    
+            </td> 
+            <td>
+                <span class="font-mono">
+                    ${acc.Port}
+                </span>    
+            </td>
+            <td>
+                <span class="font-mono">
+                    ${acc.User}
+                </span>    
+            </td>
+            <td>
+                <span class="font-mono">
+                    ${acc.Password}
+                </span>    
+            </td>
+          </tr>`)
+                }
+            })
+
+            console.log(data)
+
+            document.getElementById("task_list_proxy").innerHTML = data
+        })
+
+        /*
+
+        var data = JSON.parse("{{.discord_information}}")
+        var name = document.getElementById("usernamedata");
+
+        document.getElementById("avatar_png").innerHTML = '<img src=' + "https://cdn.discordapp.com/avatars/" + data["uuid"] + "/" + data["avatar"] + "?size=64" + '/>'
+
+        name.innerHTML = "Welcome " + data.name
+        if (localStorage.getItem("uuid") === null) {
+            localStorage.setItem("uuid", data["uuid"])
+        } else {
+            if (localStorage.getItem("uuid") !== data["uuid"]) {
+                localStorage.setItem("uuid", data["uuid"])
+            }
+        }
+
+        accs = data.data.logs || [];
+        for (const x of accs) {
+            document.getElementById("table1").innerHTML += add_logs(x);
+        }
+
+        accounts = data.data.sessions || [];
+        accounts.forEach((acc) => {
+            add_vps_html(acc);
+        });
+
+        tasks = data.data.tasks || [];
+        tasks.forEach((acc) => {
+            add_task_html(acc);
+        });
+
+        if (data['name'] === "") {
+
+        }
+
+        */
+
+    }
+</script>
+
+<body>
+    <div class="hero h-screen items-start">
+        <div class="hero-content w-screen min-w-screen flex-col items-start">
+
+            <div class="drawer">
+                <input id="my-drawer-3" type="checkbox" class="drawer-toggle" />
+                <div
+                    class="drawer-content flex flex-col bg-base-200 shadow-xl rounded-box ring-4 ring-opacity-5 ring-black">
+                    <!-- Navbar -->
+                    <div class="w-full navbar">
+                        <div class="flex md:hidden">
+
+                            <label tabindex="0" for="my-drawer-3" aria-label="open sidebar"
+                                class="btn-ghost rounded-lg avatar">
+                                <div class="w-10 rounded-lg" id="avatar_png"></div>
+                            </label>
+
+                        </div>
+                        <div class="navbar-start flex items-center">
+                            <div class="px-1 mx-3">
+                                <span class="self-center text-xl font-semibold whitespace-nowrap"><a href="/">
+                                        Crumble </a></span>
+                            </div>
+                        </div>
+                        <div class="navbar-end flex invisible md:visible hidden md:flex">
+                            <ul class="menu menu-horizontal">
+                                <!-- Navbar menu content here -->
+                                <label onclick="SwapGames('acc')"
+                                    class="btn btn-ghost modal-button transition transform hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:transform-none">Accounts</label>
+                                <label onclick="SwapGames('task')"
+                                    class="btn btn-ghost modal-button transition transform hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:transform-none">Tasks</label>
+                                <label onclick="SwapGames('proxys')"
+                                    class="btn btn-ghost modal-button transition transform hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:transform-none">Proxys</label>
+                                <label onclick="SwapGames('3c')"
+                                    class="btn btn-ghost modal-button transition transform hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:transform-none">3c</label>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="drawer-side z-[1]">
+                    <label for="my-drawer-3" aria-label="close sidebar" class="drawer-overlay"></label>
+                    <ul class="menu p-4 w-52 min-h-full bg-base-200">
+                        <!-- Navbar menu content here -->
+                        <label onclick="SwapGames('acc')"
+                            class="btn btn-ghost modal-button transition transform hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:transform-none">Accounts</label>
+                        <label onclick="SwapGames('task')"
+                            class="btn btn-ghost modal-button transition transform hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:transform-none">Tasks</label>
+                        <label onclick="SwapGames('proxys')"
+                            class="btn btn-ghost modal-button transition transform hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:transform-none">Proxys</label>
+                        <label onclick="SwapGames('3c')"
+                            class="btn btn-ghost modal-button transition transform hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:transform-none">3c</label>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="acc" style="display:none;">
+                <div id="content">
+                    <label for="my-modal-3" class="btn btn-primary btn-active m-5 w-32">Add Multiple</label>
+                    <input type="checkbox" id="my-modal-3" class="modal-toggle" />
+                    <div class="modal">
+                        <div class="modal-box">
+                            <div class="form-control">
+                                <!-- Combos -->
+                                <label class="label">
+                                    <span class="label-text">Accounts (email:password)</span>
+                                </label>
+                                <textarea id="mass_accounts" class="textarea textarea-bordered"
+                                    placeholder="email:password" rows="4"></textarea>
+
+                                <div class="modal-action">
+                                    <button onclick="mass_add_accounts_handler()" for="my-modal-3"
+                                        class="btn btn-primary">
+                                        Save accounts
+                                    </button>
+                                    <label for="my-modal-3" class="btn">Close</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mx-auto overflow-auto">
+                        <table class="table mx-auto min-w-screen table-zebra rounded-lg shadow-xl"
+                            style="table-layout:fixed;">
+                            <thead>
+                                <tr>
+                                    <th>E-Mail</th>
+                                    <th>Type</th>
+                                    <th>Usable</th>
+                                </tr>
+                            </thead>
+                            <tbody id="accounts_list"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="task" style="display:none;">
+                <div id="content">
+                    <label for="taskmodal" class="btn btn-primary btn-active m-5 w-32">Create Task</label>
+                    <input type="checkbox" id="taskmodal" class="modal-toggle" />
+                    <div class="modal">
+                        <div class="modal-box">
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text">Name to snipe</span>
+                                </label>
+                                <input id="task_name" type="text" placeholder="username" class="input input-bordered" />
+
+                                <div class="modal-action">
+                                    <button onclick="add_task_handler()" for="taskmodal" class="btn btn-primary">
+                                        Add to queue
+                                    </button>
+                                    <label for="taskmodal" class="btn">Close</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mx-auto overflow-auto">
+                        <table class="table mx-auto min-w-screen table-zebra rounded-lg shadow-xl"
+                            style="table-layout:fixed;">
+                            <thead>
+                                <tr>
+                                    <th>Info</th>
+                                    <th>Start</th>
+                                    <th>End</th>
+                                </tr>
+                            </thead>
+                            <tbody id="task_list"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="proxys" style="display:none;">
+                <div id="content">
+                    <label onclick="add_all_proxys()" for="my-modal-5" class="btn btn-primary btn-active m-5 w-32">Add
+                        Multiple Proxies</label>
+                    <input type="checkbox" id="my-modal-5" class="modal-toggle" />
+                    <div class="modal">
+                        <div class="modal-box">
+                            <div class="form-control">
+                                <!-- Combos -->
+                                <label class="label">
+                                    <span class="label-text">Proxys (ip:port OR ip:port:user:password)</span>
+                                </label>
+                                <textarea id="mass_accounts_proxys" class="textarea textarea-bordered"
+                                    placeholder="ip:port:user:pass" rows="4"></textarea>
+
+                                <div class="modal-action">
+                                    <button onclick="mass_add_accounts_handler_proxys()" for="my-modal-5"
+                                        class="btn btn-primary">
+                                        Save proxys
+                                    </button>
+                                    <label for="my-modal-5" class="btn">Close</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mx-auto overflow-auto">
+                        <table class="table mx-auto min-w-screen table-zebra rounded-lg shadow-xl"
+                            style="table-layout:fixed;">
+                            <thead>
+                                <tr>
+                                    <th>Ip</th>
+                                    <th>Port</th>
+                                    <th>User</th>
+                                    <th>Password</th>
+                                </tr>
+                            </thead>
+                            <tbody id="task_list_proxy"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="3c" style="display:none;">
+                <div id="content">
+                    <div class="mx-auto overflow-auto">
+                        <table class="table mx-auto min-w-screen table-zebra rounded-lg shadow-xl"
+                            style="table-layout:fixed;">
+                            <thead>
+                                <tr>
+                                    <th>Info</th>
+                                    <th>Start</th>
+                                    <th>End</th>
+                                </tr>
+                            </thead>
+                            <tbody id="task_list_3c"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+<script src='https://unpkg.com/@phosphor-icons/web'></script>
+
+</html>
